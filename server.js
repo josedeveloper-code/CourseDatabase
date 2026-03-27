@@ -11,30 +11,20 @@ const db = new sqlite3.Database('./database/university.db');
 // =====================
 app.get('/api/courses', (req, res) => {
     db.all('SELECT * FROM courses', (err, rows) => {
-        if (err) {
-            console.error(err.message);
-            return res.status(500).json({ error: err.message });
-        }
+        if (err) return res.status(500).json({ error: err.message });
         res.json(rows);
     });
 });
 
 // =====================
-// GET single course
+// GET single course by ID
 // =====================
 app.get('/api/courses/:id', (req, res) => {
     const id = req.params.id;
 
     db.get('SELECT * FROM courses WHERE id = ?', [id], (err, row) => {
-        if (err) {
-            console.error(err.message);
-            return res.status(500).json({ error: err.message });
-        }
-
-        if (!row) {
-            return res.status(404).json({ message: 'Course not found' });
-        }
-
+        if (err) return res.status(500).json({ error: err.message });
+        if (!row) return res.status(404).json({ message: 'Course not found' });
         res.json(row);
     });
 });
@@ -50,68 +40,43 @@ app.post('/api/courses', (req, res) => {
          VALUES (?, ?, ?, ?, ?)`,
         [courseCode, title, credits, description, semester],
         function (err) {
-            if (err) {
-                console.error(err.message);
-                return res.status(500).json({ error: err.message });
-            }
-
+            if (err) return res.status(500).json({ error: err.message });
             res.json({ id: this.lastID });
         }
     );
 });
 
 // =====================
-// UPDATE course
+// PUT update course by ID
 // =====================
-
-
-// =====================
-// PUT Course 
-// =====================
-
-
-app.put('/api/courses/:courseCode', (req, res) => {
-    const courseCode = req.params.courseCode;
+app.put('/api/courses/:id', (req, res) => {
+    const id = req.params.id;
     const { title, credits, description, semester } = req.body;
 
     db.run(
         `UPDATE courses 
          SET title = ?, credits = ?, description = ?, semester = ?
-         WHERE courseCode = ?`,
-        [title, credits, description, semester, courseCode],
+         WHERE id = ?`,
+        [title, credits, description, semester, id],
         function (err) {
-            if (err) {
-                console.error(err.message);
-                return res.status(500).json({ error: err.message });
-            }
-
-            res.json({
-                message: 'Course updated',
-                rowsUpdated: this.changes
-            });
+            if (err) return res.status(500).json({ error: err.message });
+            res.json({ message: 'Course updated', rowsUpdated: this.changes });
         }
     );
 });
 
 // =====================
-// DELETE course
+// DELETE course by ID
 // =====================
-app.delete('/api/courses/:courseCode', (req, res) => {
-    const courseCode = req.params.courseCode;
+app.delete('/api/courses/:id', (req, res) => {
+    const id = req.params.id;
 
     db.run(
-        `DELETE FROM courses WHERE courseCode = ?`,
-        [courseCode],
+        `DELETE FROM courses WHERE id = ?`,
+        [id],
         function (err) {
-            if (err) {
-                console.error(err.message);
-                return res.status(500).json({ error: err.message });
-            }
-
-            res.json({
-                message: 'Course deleted',
-                rowsDeleted: this.changes
-            });
+            if (err) return res.status(500).json({ error: err.message });
+            res.json({ message: 'Course deleted', rowsDeleted: this.changes });
         }
     );
 });
