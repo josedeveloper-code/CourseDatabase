@@ -63,6 +63,13 @@ app.post('/api/courses', (req, res) => {
 // =====================
 // UPDATE course
 // =====================
+
+
+// =====================
+// PUT Course 
+// =====================
+
+
 app.put('/api/courses/:courseCode', (req, res) => {
     const courseCode = req.params.courseCode;
     const { title, credits, description, semester } = req.body;
